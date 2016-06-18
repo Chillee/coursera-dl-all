@@ -8,6 +8,11 @@ import csv
 
 
 downloaded_links = set()
+
+def mkdir_safe(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
+
 def wait_for_load(session):
     session.wait_for(lambda: len(session.css('#course-page-sidebar > div > ul.course-navbar-list > li:nth-child(n)')) >= 1)
 
@@ -33,7 +38,14 @@ def download_all_zips_on_page(session, path='assignments'):
 
     for i in links:
         txt_file.write(i.get_attr('href')+'\n')
-        if i.get_attr('href').find('.zip')!=-1:
+        hw_strings = ['.zip', '.py', '.m', '.pdf']
+        is_hw = False
+        for j in hw_strings:
+            if i.get_attr('href').find(j)!=-1:
+                is_hw = True
+                continue
+
+        if is_hw:
             print i.get_attr('href')
             if i.get_attr('href') in downloaded_links:
                 continue
@@ -41,20 +53,23 @@ def download_all_zips_on_page(session, path='assignments'):
                 downloaded_links.add(i.get_attr('href'))
 
             urllib.urlretrieve(i.get_attr('href'), path+i.get_attr('href')[i.get_attr('href').rfind('/'):])
-            session.render(path+'/zip_page.png')
+            session.render(os.getcwd()+'/'+path+'/zip_page.png')
+
 
 def obtain_quiz_info(session, url, category_name):
     session.visit(url)
     wait_for_load(session)
-    session.render(category_name+'_home.png')
+    session.render(os.getcwd()+'/'+category_name+'_home.png')
     links = session.css('#spark > div.course-item-list > ul:nth-child(n) > li > div:nth-child(n) > div > a')
     for idx in range(len(links)):
         links[idx] = links[idx].get_attr('href')
 
     names = session.css('#spark > div.course-item-list > ul:nth-child(n) > li > div:nth-child(n) > h4')
+    print names
     for idx in range(len(names)):
         names[idx] = names[idx].text().replace(' ', '_')
         names[idx] = names[idx][:names[idx].rfind('Help Center')-len('Help Center')]
+    print names
     return zip(links, names)
 
 class Quiz(object):
@@ -72,8 +87,7 @@ def download_quiz(session, quiz, category_name):
     session.visit(quiz.url)
     wait_for_load(session)
     path = category_name+'/'+str(quiz.number)+'_'+quiz.name+'/'
-    if not os.path.exists(path):
-        os.makedirs(path)
+    mkdir_safe(path)
 
     if session.url().find('attempt')==-1:
         session.css('#spark > form > p > input')[0].click()
@@ -91,7 +105,7 @@ def download_all_quizzes(session, quiz_info, category_name):
 def obtain_assign_info(session):
     session.visit(class_url+'assignment')
     wait_for_load(session)
-    session.render(os.getcwd()+'assignment_home.png')
+    session.render(os.getcwd()+'/assignment_home.png')
     links= session.css('#spark > div.course-item-list > ul:nth-child(n) > li > div:nth-child(2) > a')
     for idx in range(len(links)):
         links[idx] = links[idx].get_attr('href')
@@ -123,8 +137,7 @@ if not args.u or not args.p:
 
 csvfile = open('classes.csv', 'r')
 reader = csv.reader(csvfile, delimiter = ' ')
-if not os.path.exists("coursera-downloads"):
-    os.mkdir("coursera-downloads")
+mkdir_safe("coursera-downloads")
 os.chdir("coursera-downloads")
 
 for i in reader:
@@ -141,8 +154,7 @@ for i in reader:
         class_slug = cur[cur.rfind('/')+1:]
     print class_url
     print class_slug
-    if not os.path.exists(class_slug):
-        os.mkdir(class_slug)
+    mkdir_safe(class_slug)
     if (args.v):
         os.system('coursera-dl -u '+args.u+' -p '+args.p+' --path='+os.getcwd()+' '+class_slug)
     os.chdir(class_slug)
@@ -177,7 +189,7 @@ for i in reader:
             download_all_quizzes(session, quiz_info, i[1])
     # print class_url
     if (args.a):
-        os.mkdir('assignments')
+        mkdir_safe("assignments")
         assign_info = obtain_assign_info(session)
         download_all_assignments(session, assign_info)
     os.chdir('..')
