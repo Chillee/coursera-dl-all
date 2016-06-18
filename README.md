@@ -14,6 +14,7 @@ A list of all classes on the old platform for Coursera
 Switch from Dryscraper to Selenium to obtain support for Windows
 Add support for forums
 Add support for human graded assignments
+Automatically sign up for courses you haven't signed up for yet.
 Fix bugs for any courses
 Suggestions?
 

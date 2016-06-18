@@ -7,6 +7,7 @@ import argparse
 import csv
 
 
+
 downloaded_links = set()
 download_type = 0
 
