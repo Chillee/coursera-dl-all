@@ -16,6 +16,12 @@ def mkdir_safe(path):
 def wait_for_load(session):
     session.wait_for(lambda: len(session.css('#course-page-sidebar > div > ul.course-navbar-list > li:nth-child(n)')) >= 1)
 
+def render(session, path):
+    session.render(path+'.png')
+    f = open(path+'.html', 'w')
+    f.write(session.body().encode('utf-8'))
+    f.close()
+
 def login(session, URL, email, password):
     session.visit(URL)
     session.wait_for(lambda: len(session.css('#user-modal-email'))>2)
@@ -24,10 +30,10 @@ def login(session, URL, email, password):
     x = session.css('#user-modal-password')[1]
     x.set(password)
     print os.getcwd()
-    session.render(os.getcwd()+'/entered_login.png')
+    render(session, os.getcwd()+'/entered_login')
     session.css('form > button')[1].click()
     wait_for_load(session)
-    session.render(os.getcwd()+'/course_home.png')
+    render(session, os.getcwd()+'/course_home')
 
 def download_all_zips_on_page(session, path='assignments'):
     links = session.css('a')
@@ -53,13 +59,13 @@ def download_all_zips_on_page(session, path='assignments'):
                 downloaded_links.add(i.get_attr('href'))
 
             urllib.urlretrieve(i.get_attr('href'), path+i.get_attr('href')[i.get_attr('href').rfind('/'):])
-            session.render(os.getcwd()+'/'+path+'/zip_page.png')
+            render(session, os.getcwd()+'/'+path+'/zip_page')
 
 
 def obtain_quiz_info(session, url, category_name):
     session.visit(url)
     wait_for_load(session)
-    session.render(os.getcwd()+'/'+category_name+'.png')
+    render(session, os.getcwd()+'/'+category_name)
     links = session.css('#spark > div.course-item-list > ul:nth-child(n) > li > div:nth-child(n) > div > a')
     for idx in range(len(links)):
         links[idx] = links[idx].get_attr('href')
@@ -94,7 +100,7 @@ def download_quiz(session, quiz, category_name):
         wait_for_load(session)
 
     download_all_zips_on_page(session, path)
-    session.render(os.getcwd()+'/'+path+str(quiz.number)+'_'+quiz.name+'.png')
+    render(session, os.getcwd()+'/'+path+str(quiz.number)+'_'+quiz.name)
 
 def download_all_quizzes(session, quiz_info, category_name):
     print quiz_info
@@ -105,7 +111,7 @@ def download_all_quizzes(session, quiz_info, category_name):
 def obtain_assign_info(session):
     session.visit(class_url+'assignment')
     wait_for_load(session)
-    session.render(os.getcwd()+'/assignment_home.png')
+    render(session, os.getcwd()+'/assignment_home')
     links= session.css('#spark > div.course-item-list > ul:nth-child(n) > li > div:nth-child(2) > a')
     for idx in range(len(links)):
         links[idx] = links[idx].get_attr('href')
@@ -134,7 +140,7 @@ def download_sidebar_pages(session):
     for i in links:
         session.visit(i[0])
         wait_for_load(session)
-        session.render(os.getcwd()+'/'+i[1]+'.png')
+        render(session, os.getcwd()+'/'+i[1])
 
 def get_class_url_info(x):
     cur = x[0].rstrip()
