@@ -7,6 +7,7 @@ import argparse
 import csv
 
 
+downloaded_links = set()
 def wait_for_load(session):
     session.wait_for(lambda: len(session.css('#course-page-sidebar > div > ul.course-navbar-list > li:nth-child(n)')) >= 1)
 
@@ -34,6 +35,10 @@ def download_all_zips_on_page(session, path='assignments'):
         txt_file.write(i.get_attr('href')+'\n')
         if i.get_attr('href').find('.zip')!=-1:
             print i.get_attr('href')
+            if i.get_attr('href') in downloaded_links:
+                continue
+            else:
+                downloaded_links.add(i.get_attr('href'))
 
             urllib.urlretrieve(i.get_attr('href'), path+i.get_attr('href')[i.get_attr('href').rfind('/'):])
             session.render(path+'/zip_page.png')
@@ -78,6 +83,7 @@ def download_quiz(session, quiz, category_name):
     session.render(os.getcwd()+'/'+path+str(quiz.number)+'_'+quiz.name+'.png')
 
 def download_all_quizzes(session, quiz_info, category_name):
+    print quiz_info
     for idx, i in enumerate(quiz_info):
         quiz_obj = Quiz(i[0], idx, i[1])
         download_quiz(session, quiz_obj, category_name)
@@ -122,6 +128,7 @@ if not os.path.exists("coursera-downloads"):
 os.chdir("coursera-downloads")
 
 for i in reader:
+
     cur = i[0].rstrip()
     class_url = ''
     class_slug = ''
@@ -134,12 +141,12 @@ for i in reader:
         class_slug = cur[cur.rfind('/')+1:]
     print class_url
     print class_slug
-
-    os.mkdir(class_slug)
+    if not os.path.exists(class_slug):
+        os.mkdir(class_slug)
     if (args.v):
         os.system('coursera-dl -u '+args.u+' -p '+args.p+' --path='+os.getcwd()+' '+class_slug)
     os.chdir(class_slug)
-    os.mkdir('assignments')
+
     # class_url= "https://class.coursera.org/pgm-003/"
     # class_url = 'https://class.coursera.org/neuralnets-2012-001/'
     # class_url='https://class.coursera.org/algs4partII-007'
@@ -170,6 +177,7 @@ for i in reader:
             download_all_quizzes(session, quiz_info, i[1])
     # print class_url
     if (args.a):
+        os.mkdir('assignments')
         assign_info = obtain_assign_info(session)
         download_all_assignments(session, assign_info)
     os.chdir('..')
