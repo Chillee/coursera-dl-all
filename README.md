@@ -7,6 +7,8 @@ Download important files on assignment pages
 Download videos (credits to coursera-dl)
 Download sidebar links (Errata, Resources, etc.)
 Download text file of important links.
+Ability to automatically sign up for a class / bypass the honor code stuff (so you don't need to sign up for a class manually to download it).
+A list of all classes on the old platform for Coursera
 
 ##Todo:
 Add support for forums
@@ -19,6 +21,7 @@ Suggestions?
 -dryscrape https://dryscrape.readthedocs.io/en/latest/installation.html#recommended-installing-dryscrape-from-pypi
 
 ##To run:
+
 First populate the classes.csv with slugs or URLs of desired classes. Slugs would be things like pgm-003 while the URL would be https://class.coursera.org/pgm-003
 k
 Next, run the program with the following tags:
@@ -36,6 +39,8 @@ neuralnets-2012-001
 while your command line prompt would be:
 
 python dl_all -u horacehe2007@yahoo.com -p hunter2 -q -v
+
+Note: A list of all classes is provided 
 
 ##Output
 The output is sorted into categories. Assignments is always there, and the other categories are pulled from the site itself.
