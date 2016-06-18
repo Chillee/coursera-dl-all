@@ -59,7 +59,7 @@ def download_all_zips_on_page(session, path='assignments'):
 def obtain_quiz_info(session, url, category_name):
     session.visit(url)
     wait_for_load(session)
-    session.render(os.getcwd()+'/'+category_name+'_home.png')
+    session.render(os.getcwd()+'/'+category_name+'.png')
     links = session.css('#spark > div.course-item-list > ul:nth-child(n) > li > div:nth-child(n) > div > a')
     for idx in range(len(links)):
         links[idx] = links[idx].get_attr('href')
@@ -123,6 +123,31 @@ def download_all_assignments(session, assign_info):
         wait_for_load(session)
         download_all_zips_on_page(session, 'assignments/'+i[1])
 
+def download_sidebar_pages(session):
+    links = session.css('#course-page-sidebar > div > ul.course-navbar-list > li:nth-child(n) > a')
+    for idx in range(len(links)):
+        links[idx] = (links[idx].get_attr('href'), links[idx].text())
+        if links[idx][0][0]=='/':
+            links[idx] = ('https://class.coursera.org'+links[idx][0], links[idx][1])
+    links = [i for i in links if i[0].find('/quiz')==-1 and i[0].find('class.coursera.org')!=-1]
+    links = list(set(links))
+    for i in links:
+        session.visit(i[0])
+        wait_for_load(session)
+        session.render(os.getcwd()+'/'+i[1]+'.png')
+
+def get_class_url_info(x):
+    cur = x[0].rstrip()
+    class_url = ''
+    class_slug = ''
+    if cur.find('class.coursera')==-1:
+        class_url = 'https://class.coursera.org/'+cur+'/'
+        class_slug = cur
+    else:
+        class_url = cur
+        cur = cur.rstrip('/')
+        class_slug = cur[cur.rfind('/')+1:]
+    return (class_url, class_slug)
 
 parser = argparse.ArgumentParser('')
 parser.add_argument('-u', help="username/email")
@@ -142,32 +167,18 @@ os.chdir("coursera-downloads")
 
 for i in reader:
 
-    cur = i[0].rstrip()
-    class_url = ''
-    class_slug = ''
-    if cur.find('class.coursera')==-1:
-        class_url = 'https://class.coursera.org/'+cur+'/'
-        class_slug = cur
-    else:
-        class_url = cur
-        cur = cur.rstrip('/')
-        class_slug = cur[cur.rfind('/')+1:]
-    print class_url
-    print class_slug
+    class_url, class_slug = get_class_url_info(i)
     mkdir_safe(class_slug)
     if (args.v):
         os.system('coursera-dl -u '+args.u+' -p '+args.p+' --path='+os.getcwd()+' '+class_slug)
     os.chdir(class_slug)
-
-    # class_url= "https://class.coursera.org/pgm-003/"
-    # class_url = 'https://class.coursera.org/neuralnets-2012-001/'
-    # class_url='https://class.coursera.org/algs4partII-007'
 
     session = dryscrape.Session()
     print "Logging In...."
     login(session, class_url, args.u, args.p )
     print "Logged in!"
 
+    download_sidebar_pages(session)
 
     if (args.q):
         # quiz_info = obtain_quiz_info(session)
