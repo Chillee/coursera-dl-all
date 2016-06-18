@@ -1,6 +1,13 @@
 # coursera-dl-all
 Extend the Coursera Downloader by downloading quizzes and assignments (and hopefully forum posts soon!). Uses coursera-dl in the process.
 
+##Features
+Download quizzes
+Download important files on assignment pages
+Download videos (credits to coursera-dl)
+Download sidebar links (Errata, Resources, etc.)
+Download text file of important links.
+
 ##Todo:
 Add support for forums
 Add support for human graded assignments
@@ -13,7 +20,7 @@ Suggestions?
 
 ##To run:
 First populate the classes.csv with slugs or URLs of desired classes. Slugs would be things like pgm-003 while the URL would be https://class.coursera.org/pgm-003
-
+k
 Next, run the program with the following tags:
 -u: for username/email  
 -p: for password  
