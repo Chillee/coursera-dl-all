@@ -52,7 +52,7 @@ def login(session, URL, email, password):
     x = session.find_elements_by_css_selector('#user-modal-password')[1]
     # x.set(password)
     x.send_keys(password)
-    print(os.getcwd())
+    # print(os.getcwd())
     render(session, os.getcwd()+'/entered_login')
     # session.css('form > button')[1].click()
     session.find_elements_by_css_selector('form > button')[1].click()
@@ -79,7 +79,7 @@ def download_all_zips_on_page(session, path='assignments'):
                 continue
 
         if is_hw:
-            print(url)
+            # print(url)
             if url in downloaded_links:
                 continue
             else:
@@ -94,7 +94,7 @@ def get_quiz_types(session):
         links[idx] = (links[idx].get_attribute('href'), links[idx].text)
         if links[idx][0][0]=='/':
             links[idx] = ('https://class.coursera.org'+links[idx][0], links[idx][1])
-            print(links)
+            # print(links)
 
     links = [i for i in links if i[0].find('/quiz')!=-1]
     links = list(set(links))
@@ -113,7 +113,7 @@ def get_quiz_info(session, url, category_name):
     for idx in range(len(names)):
         names[idx] = names[idx].text.replace(' ', '_')
         names[idx] = names[idx][:names[idx].rfind('Help Center')-len('Help Center')]
-    print(names)
+    # print(names)
     return zip(links, names)
 
 class Quiz(object):
@@ -134,6 +134,8 @@ def download_quiz(session, quiz, category_name):
     mkdir_safe(path)
 
     if session.current_url.find('attempt')==-1:
+        if len(session.find_elements_by_css_selector('#spark > form > p > input')) == 0:
+            print("Error: Couldn't download "+quiz.name)
         session.find_elements_by_css_selector('#spark > form > p > input')[0].click()
         wait_for_load(session)
 
@@ -141,7 +143,7 @@ def download_quiz(session, quiz, category_name):
     render(session, os.getcwd()+'/'+path+str(quiz.number)+'_'+quiz.name)
 
 def download_all_quizzes(session, quiz_info, category_name):
-    print(quiz_info)
+    # print(quiz_info)
     for idx, i in enumerate(quiz_info):
         quiz_obj = Quiz(i[0], idx, i[1])
         download_quiz(session, quiz_obj, category_name)
@@ -169,7 +171,7 @@ def download_all_assignments(session, assign_info):
 
 def download_sidebar_pages(session):
     links = session.find_elements_by_css_selector('#course-page-sidebar > div > ul.course-navbar-list > li:nth-child(n) > a')
-    print(links)
+    # print(links)
     for idx in range(len(links)):
         links[idx] = (links[idx].get_attribute('href'), links[idx].text)
         if links[idx][0][0]=='/':
@@ -199,6 +201,7 @@ parser.add_argument('-u', help="username/email")
 parser.add_argument('-p', help="password")
 parser.add_argument('--path', help="give a path for the folder coursera-downloads to be created")
 parser.add_argument('--download_type', help='0 for .html and .png, 1 for .html only, and 2 for .png only', type=int)
+parser.add_argument('--headless', help='If Phantom.JS is installed, enable this option to hide the browser', action="store_true")
 parser.add_argument('-q', help="download quizzes?", action="store_true")
 parser.add_argument('-a', help="download assignments?", action="store_true")
 parser.add_argument('-v', help="download videos using coursera-dl?", action="store_true")
@@ -228,7 +231,11 @@ for i in reader:
     os.chdir(class_slug)
 
     # session = dryscrape.Session()
-    session = webdriver.Firefox()
+    session=''
+    if args.headless:
+        session = webdriver.PhantomJS()
+    else:
+        session = webdriver.Firefox()
     print("Logging In....")
     login(session, class_url, args.u, args.p )
     print("Logged in!")
