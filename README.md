@@ -11,6 +11,7 @@ Ability to automatically sign up for a class / bypass the honor code stuff (so y
 A list of all classes on the old platform for Coursera
 
 ##Todo:
+Switch from Dryscraper to Selenium to obtain support for Windows
 Add support for forums
 Add support for human graded assignments
 Fix bugs for any courses
