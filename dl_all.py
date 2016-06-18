@@ -17,10 +17,11 @@ def login(session, URL, email, password):
     x.set(email)
     x = session.css('#user-modal-password')[1]
     x.set(password)
-    session.render('entered_login.png')
+    print os.getcwd()
+    session.render(os.getcwd()+'/entered_login.png')
     session.css('form > button')[1].click()
     wait_for_load(session)
-    session.render('course_home.png')
+    session.render(os.getcwd()+'/course_home.png')
 
 def download_all_zips_on_page(session, path='assignments'):
     links = session.css('a')
@@ -74,7 +75,7 @@ def download_quiz(session, quiz, category_name):
         wait_for_load(session)
 
     download_all_zips_on_page(session, path)
-    session.render(path+str(quiz.number)+'_'+quiz.name+'.png')
+    session.render(os.getcwd()+'/'+path+str(quiz.number)+'_'+quiz.name+'.png')
 
 def download_all_quizzes(session, quiz_info, category_name):
     for idx, i in enumerate(quiz_info):
@@ -84,7 +85,7 @@ def download_all_quizzes(session, quiz_info, category_name):
 def obtain_assign_info(session):
     session.visit(class_url+'assignment')
     wait_for_load(session)
-    session.render('assignment_home.png')
+    session.render(os.getcwd()+'assignment_home.png')
     links= session.css('#spark > div.course-item-list > ul:nth-child(n) > li > div:nth-child(2) > a')
     for idx in range(len(links)):
         links[idx] = links[idx].get_attr('href')
@@ -116,7 +117,8 @@ if not args.u or not args.p:
 
 csvfile = open('classes.csv', 'r')
 reader = csv.reader(csvfile, delimiter = ' ')
-os.mkdir("coursera-downloads")
+if not os.path.exists("coursera-downloads"):
+    os.mkdir("coursera-downloads")
 os.chdir("coursera-downloads")
 
 for i in reader:
