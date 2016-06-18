@@ -2,6 +2,7 @@
 Extend the Coursera Downloader by downloading quizzes and assignments (and hopefully forum posts soon!). Uses coursera-dl in the process.
 
 ##Features
+Cross-Platform (theoretically!)
 Download quizzes
 Download important files on assignment pages
 Download videos (credits to coursera-dl)
@@ -18,9 +19,12 @@ Automatically sign up for courses you haven't signed up for yet.
 Fix bugs for any courses
 Suggestions?
 
-##Dependencies:
+##Installation
 -Coursera-Dl. This must be installed if you want to download videos. If you only need to download non video stuff, just don't use the -v tag.  
--dryscrape https://dryscrape.readthedocs.io/en/latest/installation.html#recommended-installing-dryscrape-from-pypi
+pip install coursera-dl
+
+-Selenium  
+pip install selenium
 
 ##To run:
 
