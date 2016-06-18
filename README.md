@@ -1,6 +1,8 @@
 # coursera-dl-all
-Extend the Coursera Downloader by downloading quizzes and assignments (and hopefully forum posts soon!). Uses coursera-dl in the process.
-![An example of download](http://imgur.com/HTd028B)
+Extend the Coursera Downloader by downloading quizzes and assignments (and hopefully forum posts soon!). Uses coursera-dl in the process.  
+
+![An example of download](http://www.imgur.com/HTd028B.png)
+
 ##Features
 Cross-Platform (theoretically!) Python 2 & 3
 Download quizzes
