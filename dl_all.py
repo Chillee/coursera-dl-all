@@ -213,6 +213,8 @@ def download_sidebar_pages(session):
     for i in links:
         session.get(i[0])
         wait_for_load(session)
+        path = i[1]+'/'
+        download_all_zips_on_page(session, path)
         render(session, os.getcwd()+'/'+i[1])
 
 def get_class_url_info(x):
@@ -232,7 +234,7 @@ parser.add_argument('--headless', help='If Phantom.JS is installed, enable this 
 parser.add_argument('-q', help="download quizzes?", action="store_true")
 parser.add_argument('-a', help="download assignments?", action="store_true")
 parser.add_argument('-v', help="download videos using coursera-dl?", action="store_true")
-parser.add_argument('--ns', help="Don't download sidebar links", action="store_false", default=False)
+parser.add_argument('--ns', help="Don't download sidebar links", action="store_true")
 
 args = parser.parse_args()
 if not args.u or not args.p:
@@ -272,7 +274,7 @@ for i in reader:
     print("Logged in!")
     # if
 
-    if args.ns:
+    if not args.ns:
         download_sidebar_pages(session)
 
     if (args.q):
