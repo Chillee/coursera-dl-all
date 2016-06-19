@@ -70,15 +70,18 @@ def login(session, URL, email, password):   #ugly ugly code in here
                                                           session.page_source.find('ll email you if there are new session dates')!=-1)
         if len(session.find_elements_by_css_selector('.fullbleed'))>=1 and session.find_elements_by_css_selector('.fullbleed')[0].text.find('Learn more')==-1:
             session.find_elements_by_css_selector('.fullbleed')[0].click() #go to course button
-            WebDriverWait(session, 10).until(lambda session: len(session.find_elements_by_css_selector('#agreehonorcode'))>=1)
-            session.find_elements_by_css_selector('#agreehonorcode')[0].click()
-            wait_for_load(session)
+            WebDriverWait(session, 10).until(lambda session: len(session.find_elements_by_css_selector(SIDEBAR_LOAD_URL)) >=1 or
+                                                         len(session.find_elements_by_css_selector('#agreehonorcode'))>=1)
+            if len(session.find_elements_by_css_selector(SIDEBAR_LOAD_URL)) >=1:
+                pass
+            elif len(session.find_elements_by_css_selector('#agreehonorcode'))>=1:
+                session.find_elements_by_css_selector('#agreehonorcode')[0].click()
+                wait_for_load(session)
         elif len(session.find_elements_by_css_selector(SIDEBAR_LOAD_URL)) >=1:
             pass
         else:
             print("Error: Impossible to access course"+URL)
             return -1
-
     elif len(session.find_elements_by_css_selector('#agreehonorcode'))>=1:
         session.find_elements_by_css_selector('#agreehonorcode')[0].click()
         wait_for_load(session)
