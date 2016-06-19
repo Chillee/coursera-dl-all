@@ -21,6 +21,10 @@ def mkdir_safe(path):
     if not os.path.exists(path):
         os.makedirs(path)
 
+def clean_filename(path):
+    return "".join([c for c in path if re.match(r'\w', c)])
+
+
 def wait_for_load(session):
     # session.wait_for(lambda session: len(session.css('#course-page-sidebar > div > ul.course-navbar-list > li:nth-child(n)')) >= 1)
     WebDriverWait(session, 30).until(
@@ -158,7 +162,7 @@ class Quiz(object):
 def download_quiz(session, quiz, category_name):
     session.get(quiz.url)
     wait_for_load(session)
-    path = category_name+'/'+str(quiz.number)+'_'+quiz.name+'/'
+    path = category_name+'/'+str(quiz.number)+'_'+clean_filename(quiz.name)+'/'
     mkdir_safe(path)
 
     if session.current_url.find('attempt')==-1:
@@ -204,10 +208,10 @@ def download_sidebar_pages(session):
     links = session.find_elements_by_css_selector('#course-page-sidebar > div > ul.course-navbar-list > li:nth-child(n) > a')
     # print(links)
     for idx in range(len(links)):
-        links[idx] = (links[idx].get_attribute('href'), "".join([c for c in links[idx].text if re.match(r'\w', c)]))
+        links[idx] = (links[idx].get_attribute('href'), clean_filename(links[idx].text))
         if links[idx][0][0]=='/':
             links[idx] = ('https://class.coursera.org'+links[idx][0], links[idx][1])
-    links = [i for i in links if i[0].find('/quiz')==-1 and i[0].find('class.coursera.org')!=-1]
+    links = [i for i in links if i[0].find('/quiz')==-1 and i[0].find('class.coursera.org')!=-1 and i[0].find('/lecture')==-1]
     links = list(set(links))
     print(links)
     for i in links:
@@ -215,7 +219,7 @@ def download_sidebar_pages(session):
         wait_for_load(session)
         path = i[1]+'/'
         download_all_zips_on_page(session, path)
-        render(session, os.getcwd()+'/'+i[1])
+        render(session, os.getcwd()+'/'+path+i[1])
 
 def get_class_url_info(x):
     cur = x[0].rstrip()
