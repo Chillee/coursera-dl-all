@@ -16,10 +16,8 @@ A list of all classes on the old platform for Coursera
 ##Todo:
 Add support for forums  
 Add support for human graded assignments  
-Automatically sign up for courses you haven't signed up for yet.  
 Fix bugs for any courses  
 Suggestions?
-~~Switch from Dryscraper to Selenium to obtain support for Windows~~  DONE
 
 ##Installation
 -Coursera-Dl. This must be installed if you want to download videos. If you only need to download non video stuff, just don't use the -v tag.  
