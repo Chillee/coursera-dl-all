@@ -36,27 +36,20 @@ def render(session, path):
         f.write(session.page_source.encode('utf-8'))
         f.close()
 
-def login(session, URL, email, password):
-    # session.visit(URL)
+def login(session, URL, email, password):   #ugly ugly code in here
     session.get(URL)
-    # session.wait_for(lambda: len(session.css('#user-modal-email'))>2)
     # print(session.find_elements_by_css_selector('#user-modal-email')))
     WebDriverWait(session, 30).until(
         lambda session: len(session.find_elements_by_css_selector('#user-modal-email'))>2)
 
 
 
-    # x = session.css('#user-modal-email')[1]
     x = session.find_elements_by_css_selector('#user-modal-email')[1]
-    # x.set(email)
     x.send_keys(email)
-    # x = session.css('#user-modal-password')[1]
     x = session.find_elements_by_css_selector('#user-modal-password')[1]
-    # x.set(password)
     x.send_keys(password)
     # print(os.getcwd())
     render(session, os.getcwd()+'/entered_login')
-    # session.css('form > button')[1].click()
     session.find_elements_by_css_selector('form > button')[1].click()
 
     WebDriverWait(session, 30).until(
@@ -84,11 +77,6 @@ def login(session, URL, email, password):
         session.find_elements_by_css_selector('#agreehonorcode')[0].click()
         wait_for_load(session)
 
-    print(session.find_elements_by_css_selector(SIDEBAR_LOAD_URL))
-    print(session.find_elements_by_css_selector('.c-coursePage-sidebar-enroll-button'))
-    print(session.find_elements_by_css_selector('#agreehonorcode'))
-
-
     render(session, os.getcwd()+'/course_home')
     return 0
 
@@ -103,11 +91,12 @@ def download_all_zips_on_page(session, path='assignments'):
         url = i.get_attribute('href')
         if url==None:
             continue
+        url_ex = os.path.splitext(url)[1]
         txt_file.write(url+'\n')
-        hw_strings = ['.zip', '.py', '.m', '.pdf']
+        hw_strings = ['.zip', '.py', '.m', '.pdf', '.txt']
         is_hw = False
         for j in hw_strings:
-            if url.find(j)!=-1:
+            if url_ex.find(j)!=-1:
                 is_hw = True
                 continue
 
@@ -117,11 +106,14 @@ def download_all_zips_on_page(session, path='assignments'):
                 continue
             else:
                 downloaded_links.add(url)
-
-            if sys.version_info >= (3, 0):
-                urllib.request.urlretrieve(url, path+url[url.rfind('/'):])
-            else:
-                urllib.urlretrieve(url, path+url[url.rfind('/'):])
+            try:
+                if sys.version_info >= (3, 0):
+                    urllib.request.urlretrieve(url, path+url[url.rfind('/'):])
+                else:
+                    urllib.urlretrieve(url, path+url[url.rfind('/'):])
+            except urllib.error.HTTPError:
+                print("Failed to download "+url)
+                continue
             render(session, os.getcwd()+'/'+path+'/zip_page')
 
 def get_quiz_types(session):
@@ -195,8 +187,11 @@ def get_assign_info(session):
     name = session.find_elements_by_css_selector('#spark > div.course-item-list > ul:nth-child(n) > li > h4')
     for idx in range(len(name)):
         name[idx] = name[idx].text
-        name[idx] = name[idx][:name[idx].rfind('Help Center')-len('Help Center')]
+        print(name[idx])
+        # name[idx] = name[idx][:name[idx].rfind('Help Center')-len('Help Center')]
+        name[idx] = name[idx].split('\n')[0]
 
+    print(name)
     return zip(links, name)
 
 def download_all_assignments(session, assign_info):
@@ -224,7 +219,7 @@ def get_class_url_info(x):
     cur = x[0].rstrip()
     cur = cur.rstrip('/')
     class_slug = cur[cur.rfind('/')+1:]
-    class_url = "https://class.coursera.org/"+class_slug
+    class_url = "https://class.coursera.org/"+class_slug+'/'
 
     return (class_url, class_slug)
 
@@ -237,6 +232,7 @@ parser.add_argument('--headless', help='If Phantom.JS is installed, enable this 
 parser.add_argument('-q', help="download quizzes?", action="store_true")
 parser.add_argument('-a', help="download assignments?", action="store_true")
 parser.add_argument('-v', help="download videos using coursera-dl?", action="store_true")
+parser.add_argument('--ns', help="Don't download sidebar links", action="store_false", default=False)
 
 args = parser.parse_args()
 if not args.u or not args.p:
@@ -276,7 +272,8 @@ for i in reader:
     print("Logged in!")
     # if
 
-    download_sidebar_pages(session)
+    if args.ns:
+        download_sidebar_pages(session)
 
     if (args.q):
         # quiz_info = get_quiz_info(session)
