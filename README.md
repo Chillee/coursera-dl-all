@@ -1,23 +1,25 @@
 # coursera-dl-all
-Extend the Coursera Downloader by downloading quizzes and assignments (and hopefully forum posts soon!). Uses coursera-dl in the process.
+Extend the Coursera Downloader by downloading quizzes and assignments (and hopefully forum posts soon!). Uses coursera-dl in the process.  
+
+![An example of download](http://www.imgur.com/HTd028B.png)
 
 ##Features
-Cross-Platform (theoretically!) Python 2 & 3
-Download quizzes
-Download important files on assignment pages
-Download videos (credits to coursera-dl)
-Download sidebar links (Errata, Resources, etc.)
-Download text file of important links.
-Ability to automatically sign up for a class / bypass the honor code stuff (so you don't need to sign up for a class manually to download it).
-A list of all classes on the old platform for Coursera
+Cross-Platform (theoretically!) Python 2 & 3  
+Download quizzes  
+Download important files on assignment pages  
+Download videos (credits to coursera-dl)  
+Download sidebar links (Errata, Resources, etc.)  
+Download text file of important links.  
+Ability to automatically sign up for a class / bypass the honor code stuff (so you don't need to sign up for a class manually to download it).  
+A list of all classes on the old platform for Coursera  
 
 ##Todo:
-Switch from Dryscraper to Selenium to obtain support for Windows
-Add support for forums
-Add support for human graded assignments
-Automatically sign up for courses you haven't signed up for yet.
-Fix bugs for any courses
+Add support for forums  
+Add support for human graded assignments  
+Automatically sign up for courses you haven't signed up for yet.  
+Fix bugs for any courses  
 Suggestions?
+~~Switch from Dryscraper to Selenium to obtain support for Windows~~  DONE
 
 ##Installation
 -Coursera-Dl. This must be installed if you want to download videos. If you only need to download non video stuff, just don't use the -v tag.  
