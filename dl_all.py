@@ -59,13 +59,15 @@ def login(session, URL, email, password):   #ugly ugly code in here
     WebDriverWait(session, 30).until(
         lambda session: len(session.find_elements_by_css_selector(SIDEBAR_LOAD_URL)) >=1 or
                         len(session.find_elements_by_css_selector('.c-coursePage-sidebar-enroll-button'))>=1 or
-                        len(session.find_elements_by_css_selector('#agreehonorcode'))>=1)
+                        len(session.find_elements_by_css_selector('#agreehonorcode'))>=1 or
+                        session.page_source.find('Remove from watchlist')!=-1)
 
     if len(session.find_elements_by_css_selector('.c-coursePage-sidebar-enroll-button')) >=1:
         session.find_elements_by_css_selector('.c-coursePage-sidebar-enroll-button')[0].click()  #enroll button
         WebDriverWait(session, 10).until(lambda session:  len(session.find_elements_by_css_selector(SIDEBAR_LOAD_URL)) >=1 or
                                                           len(session.find_elements_by_css_selector('.fullbleed'))>=1 or
-                                                          session.page_source.find('we will notify you by email when it starts')!=-1)
+                                                          session.page_source.find('we will notify you by email when it starts')!=-1 or
+                                                          session.page_source.find('ll email you if there are new session dates')!=-1)
         if len(session.find_elements_by_css_selector('.fullbleed'))>=1 and session.find_elements_by_css_selector('.fullbleed')[0].text.find('Learn more')==-1:
             session.find_elements_by_css_selector('.fullbleed')[0].click() #go to course button
             WebDriverWait(session, 10).until(lambda session: len(session.find_elements_by_css_selector('#agreehonorcode'))>=1)
@@ -80,6 +82,9 @@ def login(session, URL, email, password):   #ugly ugly code in here
     elif len(session.find_elements_by_css_selector('#agreehonorcode'))>=1:
         session.find_elements_by_css_selector('#agreehonorcode')[0].click()
         wait_for_load(session)
+    elif session.page_source.find('Remove from watchlist')!=-1:
+        print("Error: Impossible to access course"+URL)
+        return -1
 
     render(session, os.getcwd()+'/course_home')
     return 0
@@ -273,7 +278,7 @@ for i in reader:
     print("Logging In....")
     error = login(session, class_url, args.u, args.p )
     if (error==-1):
-        session.exit()
+        session.close()
         continue
     print("Logged in!")
     # if
