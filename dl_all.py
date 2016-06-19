@@ -191,11 +191,12 @@ def get_class_url_info(x):
     if cur.find('class.coursera')==-1:
         class_url = 'https://class.coursera.org/'+cur+'/'
         class_slug = cur
-    else:
         if cur.find('www.coursera.org')!=-1:
             print("Please input the classes in the form class.coursera.org/<class> or <class>")
             print("for example, https://class.coursera.org/pgm-003 or pgm-003")
             sys.exit()
+    else:
+
         class_url = cur
         cur = cur.rstrip('/')
         class_slug = cur[cur.rfind('/')+1:]
@@ -230,6 +231,7 @@ os.chdir("coursera-downloads")
 for i in reader:
 
     class_url, class_slug = get_class_url_info(i)
+    print(class_url, class_slug)
     mkdir_safe(class_slug)
     if (args.v):
         os.system('coursera-dl -u '+args.u+' -p '+args.p+' --path='+os.getcwd()+' '+class_slug)
