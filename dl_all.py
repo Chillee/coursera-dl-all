@@ -21,7 +21,7 @@ def mkdir_safe(path):
 
 def wait_for_load(session):
     # session.wait_for(lambda session: len(session.css('#course-page-sidebar > div > ul.course-navbar-list > li:nth-child(n)')) >= 1)
-    WebDriverWait(session, 10).until(
+    WebDriverWait(session, 30).until(
         lambda session: len(session.find_elements_by_css_selector('#course-page-sidebar > div > ul.course-navbar-list > li:nth-child(n)')) >=1)
 
 def render(session, path):
@@ -39,7 +39,7 @@ def login(session, URL, email, password):
     session.get(URL)
     # session.wait_for(lambda: len(session.css('#user-modal-email'))>2)
     # print(session.find_elements_by_css_selector('#user-modal-email')))
-    WebDriverWait(session, 10).until(
+    WebDriverWait(session, 30).until(
         lambda session: len(session.find_elements_by_css_selector('#user-modal-email'))>2)
 
 
@@ -192,7 +192,7 @@ def get_class_url_info(x):
         class_url = 'https://class.coursera.org/'+cur+'/'
         class_slug = cur
         if cur.find('www.coursera.org')!=-1:
-            print("Please input the classes in the form class.coursera.org/<class> or <class>")
+            print("ERROR: Please input the classes in the form class.coursera.org/<class> or <class>")
             print("for example, https://class.coursera.org/pgm-003 or pgm-003")
             sys.exit()
     else:
