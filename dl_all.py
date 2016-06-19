@@ -29,7 +29,7 @@ def render(session, path):
         # session.render(path+'.png')
         session.save_screenshot(path+'.png')
     if download_type==0 or download_type==1:
-        f = open(path+'.html', 'w')
+        f = open(path+'.html', 'wb')
         # f.write(session.body().encode('utf-8'))
         f.write(session.page_source.encode('utf-8'))
         f.close()
