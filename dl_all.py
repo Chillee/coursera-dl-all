@@ -217,7 +217,6 @@ if not args.u or not args.p:
     print("Please enter a username and a password using the -u and -p tags")
     sys.exit()
 
-print(args)
 if args.download_type:
     download_type = args.download_type
 
