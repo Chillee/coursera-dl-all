@@ -33,7 +33,8 @@ pip install selenium
 ##To run:
 
 First populate the classes.csv with slugs or URLs of desired classes. Slugs would be things like pgm-003 while the URL would be https://class.coursera.org/pgm-003
-k
+
+note: coursera.org/learn/<class> doesn't work.  
 Next, run the program with the following tags:
 -u: for username/email  
 -p: for password  
@@ -53,7 +54,8 @@ while your command line prompt would be:
 
 python dl_all.py -u horacehe2007@yahoo.com -p hunter2 -q -v
 
-Note: A list of all classes is provided 
+note: you must be signed up for the courses.
+Note: A list of all classes is provided (not in the right format though)
 
 ##Output
 The output is sorted into categories. Assignments is always there, and the other categories are pulled from the site itself.
