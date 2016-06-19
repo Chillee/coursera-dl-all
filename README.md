@@ -51,7 +51,7 @@ neuralnets-2012-001
 
 while your command line prompt would be:
 
-python dl_all -u horacehe2007@yahoo.com -p hunter2 -q -v
+python dl_all.py -u horacehe2007@yahoo.com -p hunter2 -q -v
 
 Note: A list of all classes is provided 
 
