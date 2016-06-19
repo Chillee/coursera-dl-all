@@ -184,6 +184,7 @@ def download_sidebar_pages(session):
         render(session, os.getcwd()+'/'+i[1])
 
 def get_class_url_info(x):
+
     cur = x[0].rstrip()
     class_url = ''
     class_slug = ''
@@ -191,6 +192,10 @@ def get_class_url_info(x):
         class_url = 'https://class.coursera.org/'+cur+'/'
         class_slug = cur
     else:
+        if cur.find('www.coursera.org')!=-1:
+            print("Please input the classes in the form class.coursera.org/<class> or <class>")
+            print("for example, https://class.coursera.org/pgm-003 or pgm-003")
+            sys.exit()
         class_url = cur
         cur = cur.rstrip('/')
         class_slug = cur[cur.rfind('/')+1:]
