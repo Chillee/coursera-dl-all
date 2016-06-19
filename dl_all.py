@@ -271,6 +271,7 @@ for i in reader:
     print("Logging In....")
     error = login(session, class_url, args.u, args.p )
     if (error==-1):
+        session.exit()
         continue
     print("Logged in!")
     # if
