@@ -9,11 +9,13 @@ import os
 import urllib
 import argparse
 import csv
+import re
 
 
 
 downloaded_links = set()
 download_type = 0
+SIDEBAR_LOAD_URL ='#course-page-sidebar > div > ul.course-navbar-list > li:nth-child(n)'
 
 def mkdir_safe(path):
     if not os.path.exists(path):
@@ -22,7 +24,7 @@ def mkdir_safe(path):
 def wait_for_load(session):
     # session.wait_for(lambda session: len(session.css('#course-page-sidebar > div > ul.course-navbar-list > li:nth-child(n)')) >= 1)
     WebDriverWait(session, 30).until(
-        lambda session: len(session.find_elements_by_css_selector('#course-page-sidebar > div > ul.course-navbar-list > li:nth-child(n)')) >=1)
+        lambda session: len(session.find_elements_by_css_selector(SIDEBAR_LOAD_URL)) >=1)
 
 def render(session, path):
     if download_type==0 or download_type==2:
@@ -56,8 +58,39 @@ def login(session, URL, email, password):
     render(session, os.getcwd()+'/entered_login')
     # session.css('form > button')[1].click()
     session.find_elements_by_css_selector('form > button')[1].click()
-    wait_for_load(session)
+
+    WebDriverWait(session, 30).until(
+        lambda session: len(session.find_elements_by_css_selector(SIDEBAR_LOAD_URL)) >=1 or
+                        len(session.find_elements_by_css_selector('.c-coursePage-sidebar-enroll-button'))>=1 or
+                        len(session.find_elements_by_css_selector('#agreehonorcode'))>=1)
+
+    if len(session.find_elements_by_css_selector('.c-coursePage-sidebar-enroll-button')) >=1:
+        session.find_elements_by_css_selector('.c-coursePage-sidebar-enroll-button')[0].click()  #enroll button
+        WebDriverWait(session, 10).until(lambda session:  len(session.find_elements_by_css_selector(SIDEBAR_LOAD_URL)) >=1 or
+                                                          len(session.find_elements_by_css_selector('.fullbleed'))>=1 or
+                                                          session.page_source.find('we will notify you by email when it starts')!=-1)
+        if len(session.find_elements_by_css_selector('.fullbleed'))>=1 and session.find_elements_by_css_selector('.fullbleed')[0].text.find('Learn more')==-1:
+            session.find_elements_by_css_selector('.fullbleed')[0].click() #go to course button
+            WebDriverWait(session, 10).until(lambda session: len(session.find_elements_by_css_selector('#agreehonorcode'))>=1)
+            session.find_elements_by_css_selector('#agreehonorcode')[0].click()
+            wait_for_load(session)
+        elif len(session.find_elements_by_css_selector(SIDEBAR_LOAD_URL)) >=1:
+            pass
+        else:
+            print("Error: Impossible to access course"+URL)
+            return -1
+
+    elif len(session.find_elements_by_css_selector('#agreehonorcode'))>=1:
+        session.find_elements_by_css_selector('#agreehonorcode')[0].click()
+        wait_for_load(session)
+
+    print(session.find_elements_by_css_selector(SIDEBAR_LOAD_URL))
+    print(session.find_elements_by_css_selector('.c-coursePage-sidebar-enroll-button'))
+    print(session.find_elements_by_css_selector('#agreehonorcode'))
+
+
     render(session, os.getcwd()+'/course_home')
+    return 0
 
 def download_all_zips_on_page(session, path='assignments'):
     links = session.find_elements_by_css_selector('a')
@@ -85,7 +118,10 @@ def download_all_zips_on_page(session, path='assignments'):
             else:
                 downloaded_links.add(url)
 
-            urllib.urlretrieve(url, path+url[url.rfind('/'):])
+            if sys.version_info >= (3, 0):
+                urllib.request.urlretrieve(url, path+url[url.rfind('/'):])
+            else:
+                urllib.urlretrieve(url, path+url[url.rfind('/'):])
             render(session, os.getcwd()+'/'+path+'/zip_page')
 
 def get_quiz_types(session):
@@ -173,11 +209,12 @@ def download_sidebar_pages(session):
     links = session.find_elements_by_css_selector('#course-page-sidebar > div > ul.course-navbar-list > li:nth-child(n) > a')
     # print(links)
     for idx in range(len(links)):
-        links[idx] = (links[idx].get_attribute('href'), links[idx].text)
+        links[idx] = (links[idx].get_attribute('href'), "".join([c for c in links[idx].text if re.match(r'\w', c)]))
         if links[idx][0][0]=='/':
             links[idx] = ('https://class.coursera.org'+links[idx][0], links[idx][1])
     links = [i for i in links if i[0].find('/quiz')==-1 and i[0].find('class.coursera.org')!=-1]
     links = list(set(links))
+    print(links)
     for i in links:
         session.get(i[0])
         wait_for_load(session)
@@ -195,7 +232,7 @@ parser = argparse.ArgumentParser('')
 parser.add_argument('-u', help="username/email")
 parser.add_argument('-p', help="password")
 parser.add_argument('--path', help="give a path for the folder coursera-downloads to be created")
-parser.add_argument('--download_type', help='0 for .html and .png, 1 for .html only, and 2 for .png only', type=int)
+parser.add_argument('--download_type', help='0 for .html and .png, 1 for .html only, and 2 for .png only', type=int, default=1)
 parser.add_argument('--headless', help='If Phantom.JS is installed, enable this option to hide the browser', action="store_true")
 parser.add_argument('-q', help="download quizzes?", action="store_true")
 parser.add_argument('-a', help="download assignments?", action="store_true")
@@ -232,8 +269,11 @@ for i in reader:
     else:
         session = webdriver.Firefox()
     print("Logging In....")
-    login(session, class_url, args.u, args.p )
+    error = login(session, class_url, args.u, args.p )
+    if (error==-1):
+        continue
     print("Logged in!")
+    # if
 
     download_sidebar_pages(session)
 
