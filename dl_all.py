@@ -98,9 +98,8 @@ def download_all_zips_on_page(session, path='assignments'):
     if not os.path.exists(path):
         os.makedirs(path)
     txt_file = open(path+'/links.txt', 'w')
-    links = [i.get_attribute('href') for i in links]
-    for i in links:
-        url = i
+    links = [url.get_attribute('href') for url in links]
+    for url in links:
         if url==None:
             continue
         url_ex = os.path.splitext(url)[1]
@@ -198,7 +197,7 @@ def get_assign_info(session):
 
     name = session.find_elements_by_css_selector('#spark > div.course-item-list > ul:nth-child(n) > li > h4')
     for idx in range(len(name)):
-        name[idx] = name[idx].text
+        name[idx] = clean_filename(name[idx].text)
         print(name[idx])
         # name[idx] = name[idx][:name[idx].rfind('Help Center')-len('Help Center')]
         name[idx] = name[idx].split('\n')[0]
