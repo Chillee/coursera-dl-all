@@ -175,7 +175,10 @@ def download_quiz(session, quiz, category_name):
     if session.current_url.find('attempt')==-1:
         if len(session.find_elements_by_css_selector('#spark > form > p > input')) == 0:
             print("Error: Couldn't download "+quiz.name)
-        session.find_elements_by_css_selector('#spark > form > p > input')[0].click()
+        try:
+            session.find_elements_by_css_selector('#spark > form > p > input')[0].click()
+        except IndexError:
+            print(quiz.url+' not accessible.')
         wait_for_load(session)
 
     download_all_zips_on_page(session, path)
@@ -220,7 +223,7 @@ def download_sidebar_pages(session):
             links[idx] = ('https://class.coursera.org'+links[idx][0], links[idx][1])
     links = [i for i in links if i[0].find('/quiz')==-1 and i[0].find('class.coursera.org')!=-1 and i[0].find('/lecture')==-1]
     links = list(set(links))
-    print(links)
+    # print(links)
     for i in links:
         session.get(i[0])
         wait_for_load(session)
