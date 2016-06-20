@@ -185,7 +185,7 @@ def download_quiz(session, quiz, category_name):
 def download_all_quizzes(session, quiz_info, category_name):
     # print(quiz_info)
     for idx, i in enumerate(quiz_info):
-        quiz_obj = Quiz(i[0], idx, i[1])
+        quiz_obj = Quiz(i[0], idx, clean_filename(i[1]))
         download_quiz(session, quiz_obj, category_name)
 
 def get_assign_info(session):
