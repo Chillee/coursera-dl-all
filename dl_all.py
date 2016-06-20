@@ -98,9 +98,9 @@ def download_all_zips_on_page(session, path='assignments'):
     if not os.path.exists(path):
         os.makedirs(path)
     txt_file = open(path+'/links.txt', 'w')
-
+    links = [i for i.get_attribute('href') in links]
     for i in links:
-        url = i.get_attribute('href')
+        url = i
         if url==None:
             continue
         url_ex = os.path.splitext(url)[1]
