@@ -112,7 +112,7 @@ def download_all_zips_on_page(session, path='assignments'):
                 continue
 
         if is_hw:
-            # print(url)
+            print(url)
             if url in downloaded_links:
                 continue
             else:
