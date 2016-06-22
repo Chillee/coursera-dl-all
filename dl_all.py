@@ -6,7 +6,7 @@ from selenium.webdriver.common.by import By
 import time
 import sys
 import os
-import urllib
+import requests
 import argparse
 import csv
 import re
@@ -117,14 +117,17 @@ def download_all_zips_on_page(session, path='assignments'):
                 continue
             else:
                 downloaded_links.add(url)
-            try:
-                if sys.version_info >= (3, 0):
-                    urllib.request.urlretrieve(url, path+url[url.rfind('/'):])
-                else:
-                    urllib.urlretrieve(url, path+url[url.rfind('/'):])
-            except urllib.error.HTTPError:
-                print("Failed to download "+url)
-                continue
+            # try:
+            #     if sys.version_info >= (3, 0):
+            #         urllib.request.urlretrieve(url, path+url[url.rfind('/'):])
+            #     else:
+            #         urllib.urlretrieve(url, path+url[url.rfind('/'):])
+            # except urllib.error.HTTPError:
+            #     print("Failed to download "+url)
+            #     continue
+            r = requests.get(url)
+            with open(path+url[url.rfind('/'):], 'wb') as f:
+                f.write(r.content)
             render(session, os.getcwd()+'/'+path+'/zip_page')
 
 def get_quiz_types(session):
