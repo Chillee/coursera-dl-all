@@ -10,12 +10,16 @@ import requests
 import argparse
 import csv
 import re
+import shutil
 
 
 
 downloaded_links = set()
 download_type = 0
 SIDEBAR_LOAD_URL ='#course-page-sidebar > div > ul.course-navbar-list > li:nth-child(n)'
+class_url=''
+class_slug=''
+home_dir=''
 
 def mkdir_safe(path):
     if not os.path.exists(path):
@@ -31,6 +35,8 @@ def wait_for_load(session):
         lambda session: len(session.find_elements_by_css_selector(SIDEBAR_LOAD_URL)) >=1)
 
 def render(session, path):
+    # print(session.current_url)
+    # render_path(session)
     if download_type==0 or download_type==2:
         # session.render(path+'.png')
         session.save_screenshot(path+'.png')
@@ -39,6 +45,23 @@ def render(session, path):
         # f.write(session.body().encode('utf-8'))
         f.write(session.page_source.encode('utf-8'))
         f.close()
+
+# def render_path(session):
+#     s = 'class.coursera.org/'+class_slug
+#     path = session.current_url
+#     path = path[path.find(s)+len(s)+1:]
+#     # print('path: '+path)
+#     if path=='':
+#         path='home'
+#     if os.path.splitext(path)[1].find('.html')==-1:
+#         path = path+'.html'
+#     path = os.path.join(home_dir,path)
+#     mkdir_safe(os.path.dirname(path))
+#     f = open(path, 'wb')
+#     f.write(session.page_source.encode('utf-8'))
+#     f.close()
+#     print(os.path.join(home_dir,path))
+
 
 def login(session, URL, email, password):   #ugly ugly code in here
     session.get(URL)
@@ -97,13 +120,16 @@ def download_all_zips_on_page(session, path='assignments'):
 
     if not os.path.exists(path):
         os.makedirs(path)
-    txt_file = open(path+'/links.txt', 'w')
+    if args.download_type!=1:
+        txt_file = open(path+'/links.txt', 'w')
+
     links = [url.get_attribute('href') for url in links]
     for url in links:
         if url==None:
             continue
         url_ex = os.path.splitext(url)[1]
-        txt_file.write(url+'\n')
+        if args.download_type!=1:
+            txt_file.write(url+'\n')
         hw_strings = ['.zip', '.py', '.m', '.pdf', '.txt']
         is_hw = False
         for j in hw_strings:
@@ -112,7 +138,6 @@ def download_all_zips_on_page(session, path='assignments'):
                 continue
 
         if is_hw:
-            print(url)
             if url in downloaded_links:
                 continue
             else:
@@ -125,6 +150,7 @@ def download_all_zips_on_page(session, path='assignments'):
             # except urllib.error.HTTPError:
             #     print("Failed to download "+url)
             #     continue
+            print(url)
             r = requests.get(url)
             with open(path+url[url.rfind('/'):], 'wb') as f:
                 f.write(r.content)
@@ -232,6 +258,10 @@ def download_sidebar_pages(session):
         wait_for_load(session)
         path = i[1]+'/'
         download_all_zips_on_page(session, path)
+        print(path, os.listdir(os.getcwd()+'/'+path))
+        if len(os.listdir(os.getcwd()+'/'+path))==0:
+            os.rmdir(os.getcwd()+'/'+path)
+            path=''
         render(session, os.getcwd()+'/'+path+i[1])
 
 def get_class_url_info(x):
@@ -265,6 +295,7 @@ csvfile = open('classes.csv', 'r')
 reader = csv.reader(csvfile, delimiter = ' ')
 if args.path:
     os.chdir(args.path)
+home_dir=os.getcwd()
 mkdir_safe("coursera-downloads")
 os.chdir("coursera-downloads")
 
@@ -276,6 +307,7 @@ for i in reader:
     if (args.v):
         os.system('coursera-dl -u '+args.u+' -p '+args.p+' --path='+os.getcwd()+' '+class_slug)
     os.chdir(class_slug)
+    home_dir = os.getcwd()
 
     # session = dryscrape.Session()
     session=''
@@ -308,7 +340,7 @@ for i in reader:
         assign_info = get_assign_info(session)
         download_all_assignments(session, assign_info)
     os.chdir('..')
-    session.close()
+    session.quit()
 
 
 
