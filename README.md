@@ -13,6 +13,21 @@ Download text file of important links.
 Ability to automatically sign up for a class / bypass the honor code stuff (so you don't need to sign up for a class manually to download it).  
 A list of all classes on the old platform for Coursera  
 
+
+##Step by Step Instructions (Thanks to Light1980 for the initial write up)
+1. Make sure you have Firefox installed (below version 47)
+2. Make sure you have python installed (2 or 3, although 3 is preferred)
+3. Install coursera_dl with pip if you want to download videos. `pip install coursera_dl`
+4. Download this repository as a zip file.
+5. Unzip the file to your preferred location.
+7. Fill in classes.csv file with your course url / slugs and save. `pgm-003` or `class.coursera.org/pgm-003`
+8. open up your terminal/CMD and change your directory to the location of dl_all.py.
+For example:  
+`cd F:\coursera-dl-all-master\coursera-dl-all-master`
+9. Write command like (the things in parenthese are for explanation and should not be kept)
+
+`python dl_all.py -u your_coursera_account -p your_password  -v(download video) -a(download assignment) -q(download quiz) --path the_location_of_download`
+
 ##Todo:
 Add support for forums  
 Add support for human graded assignments  
@@ -28,6 +43,7 @@ pip install selenium
 
 -PhantomJS. (optional) If you want to run the program with the browser invisible, install this
 
+##
 ##To run:
 
 First populate the classes.csv with slugs or URLs of desired classes. Slugs would be things like pgm-003 while the URL would be https://class.coursera.org/pgm-003
