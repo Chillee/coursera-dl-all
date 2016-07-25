@@ -1,4 +1,6 @@
 # coursera-dl-all
+
+#NOTE: THIS PROJECT IS OBSOLETE POST 6/30/2016. Coursera has fully committed to their new format, and this application was designed for their old class format. 
 Extend the Coursera Downloader by downloading quizzes and assignments (and hopefully forum posts soon!). Uses coursera-dl in the process.  
 
 ![An example of download](http://www.imgur.com/HTd028B.png)
